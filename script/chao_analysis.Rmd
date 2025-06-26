@@ -26,18 +26,20 @@ sf::sf_use_s2(use_s2 = FALSE)
 # Load Data
 
 ```{r}
+# spp_biodiv_df <- my_path("D", name = "spp_biodiversity_data.csv", read = T)
 
 
-# Spp data
-spp_biodiv_df <- read_excel("~/Library/CloudStorage/OneDrive-UBC/Data/barbados_deepsea_biodiv/Data/Barbados Deep-Sea Occurrence Data.xlsx", 
-    sheet = "Species") %>% 
-  clean_names()
+sheet_url <- "https://docs.google.com/spreadsheets/d/1zDLZ5miZ0zkxt3uwPoNs-wWiTkUkr5bfBY41Hj-sqck/edit?gid=0#gid=0"
 
-  
-  # Family data
-fam_biodiv_df <- read_excel("~/Library/CloudStorage/OneDrive-UBC/Data/barbados_deepsea_biodiv/Data/Barbados Deep-Sea Occurrence Data.xlsx",
-    sheet = "Family")%>% 
-  clean_names()
+spp_biodiv_df <- read_sheet(sheet_url,
+                   sheet = "Species",
+                   col_types = "c"
+                   ) %>%
+      janitor::clean_names() %>% 
+      dplyr::mutate(across(hassler_expedition:species_occurrence, ~ as.numeric(.x)))
+
+fam_biodiv_df <- my_path("D", name = "fam_biodiversity_data.csv", read = T)
+
 ```
 
 # Species curve
