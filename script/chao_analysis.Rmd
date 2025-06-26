@@ -65,7 +65,7 @@ run_biodiv_analysis <- function(df_subset) {
       community_matrix_pres[is.na(community_matrix_pres)] <- 0
       
       inc_freq <- as.incfreq(as.matrix(t(community_matrix_pres)))
-      iNEXT(inc_freq, q = 0, datatype = "incidence_freq", nboot = 1, endpoint = 250) # q and qdp is what plots
+      iNEXT(inc_freq, q = 0, datatype = "incidence_freq", nboot = 1, endpoint = 750) # q and qdp is what plots
 }
 
 # Split and run analysis by benthic/pelagic group
@@ -106,7 +106,7 @@ bio_spp <-
       xlab("Number of sampling units") +
     ylab("Species Diversity") +
     my_ggtheme_p(leg_pos = "right") +
-    scale_y_continuous(breaks = seq(0, 3000, 100)) +
+    scale_y_continuous(breaks = seq(0, 3000, 250)) +
     scale_linetype_manual(values = c("twodash", "solid"))
 
 
@@ -133,19 +133,36 @@ N
 In the context of biodiversity studies and using the iNEXT package, S(obs) refers to the observed species richness. This is the actual number of species observed in the samples collected. It is an important measure because it represents the baseline diversity observed in your data before any rarefaction or extrapolation.
 
 ```{r}
-S_obs <- Hills_q_0_inc_CCZ$AsyEst$Observed[1] #652
-S_obs
 
-S_se <- Hills_q_0_inc_CCZ$AsyEst$Est_s.e.[1] #203.42
+# For Benthic species
+sb_obs <- results_list$Benthic$AsyEst$Observed[1] # 396
+sb_se <- results_list$Benthic$AsyEst$Est_s.e.[1] #88.12
 
-N <- nrow(community_matrix_pres)
-N # 20
-diversity_indices <- Hills_q_0_inc_CCZ$AsyEst
+# For Pelagic species
+sp_obs <- results_list$Pelagic$AsyEst$Observed[1] # 148
+sb_se <- results_list$Pelagic$AsyEst$Est_s.e.[1] #131.35
 
-write_csv(diversity_indices %>% mutate(category = c("Species Richness", "Shannon div.", "Simpson div"),
-                                             ,level = "secies",n = 11) %>% 
-                select(category,everything()),
-          "../results/spp_diversity_indices.csv")
+
+bind_rows(
+      # Benthic data
+      results_list$Benthic$AsyEst %>% 
+            mutate(category = c("Species Richness", "Shannon div.", "Simpson div"),
+                   ,level = "secies",n = 11,
+                   Benthic_Plagic = "Benthic") %>%
+            select(category,everything()
+            ),
+      
+      # Pelagic data
+      results_list$Pelagic$AsyEst %>% 
+            mutate(category = c("Species Richness", "Shannon div.", "Simpson div"),
+                   ,level = "secies",n = 11,
+                   Benthic_Plagic = "Pelagic") %>%
+            select(category,everything()) 
+            
+) %>% 
+# Save dataset
+write_csv(
+          "../results/spp_diversity_indices_bp.csv")
 
 ```
 
