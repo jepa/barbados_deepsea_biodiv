@@ -44,6 +44,15 @@ spp_biodiv_df <- read_sheet(sheet_url,
 fam_biodiv_df <- my_path("D", name = "fam_biodiversity_data.csv", read = T)
   
 
+fam_biodiv_df <- read_sheet(sheet_url,
+                   sheet = "Family",
+                   col_types = "c"
+                   ) %>%
+      janitor::clean_names() %>% 
+      dplyr::mutate(across(hassler_expedition:family_occurrence, ~ as.numeric(.x))) %>% 
+  filter(!is.na(benthic_pelagic),
+         benthic_pelagic != "N/A")
+
 ```
 
 # Speceis curve Benthic pelagic 
@@ -222,7 +231,7 @@ pp <- gridExtra::grid.arrange(
       ncol = 1)
 
 ggsave(
-      "diversity_plots_bp_line.png",
+      "../results/diversity_plots_bp_line.png",
       pp,
       width = 9,
       height = 7
