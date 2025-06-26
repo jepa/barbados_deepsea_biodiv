@@ -216,13 +216,15 @@ write_csv(diversity_indices %>% mutate(category = c("Species Richness", "Shannon
 
 ```{r}
 
-pp <- gridExtra::grid.arrange(bio_spp,
-                        bio_fam,
-                        ncol = 1)
+pp <- gridExtra::grid.arrange(
+      bio_fam + theme(legend.position = "none"),
+      bio_spp+ theme(legend.position = "bottom"),
+      ncol = 1)
+
 ggsave(
-      "../results/diversity_plots.png",
+      "diversity_plots_bp_line.png",
       pp,
-      width = 7,
+      width = 9,
       height = 7
 )
 
