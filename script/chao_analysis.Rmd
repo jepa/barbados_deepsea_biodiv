@@ -228,7 +228,7 @@ diversity_indices <- Hills_q_0_inc_CCZ$AsyEst
 write_csv(diversity_indices %>% mutate(category = c("Species Richness", "Shannon div.", "Simpson div"),
                                              ,level = "family",n = 11) %>% 
                 select(category,everything()),
-          "../results/fam_diversity_indices.csv")
+          "../results/fam_diversity_indices_new.csv")
 
 ```
 
@@ -240,7 +240,7 @@ pp <- gridExtra::grid.arrange(
       ncol = 1)
 
 ggsave(
-      "../results/diversity_plots_bp_line.png",
+      "../results/diversity_plots_bp_line_new.png",
       pp,
       width = 9,
       height = 7
