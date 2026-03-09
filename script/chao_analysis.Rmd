@@ -245,3 +245,68 @@ ggsave(
 
 ```
 
+# Species curve by depth boxes
+
+```{r}
+# spp_biodiv_df <- my_path("D", name = "spp_biodiversity_data.csv", read = T)
+
+
+sheet_url <- "https://docs.google.com/spreadsheets/d/1zDLZ5miZ0zkxt3uwPoNs-wWiTkUkr5bfBY41Hj-sqck/edit?usp=sharing"
+
+
+spp_biodiv_df <- read_sheet(sheet_url,
+                            sheet = "Species_624",
+                            col_types = "c"
+) %>%
+      janitor::clean_names() %>% 
+      dplyr::mutate(across(hassler_expedition:species_occurrence, ~ as.numeric(.x)))
+
+
+
+```
+
+## Explore depth boxes
+
+```{r}
+
+spp_biodiv_df %>% 
+      filter(!is.na(depth_boxes)) %>%
+      group_by(benthic_pelagic,depth_boxes) %>% 
+      summarise(n = n()) %>% 
+  group_by(benthic_pelagic) %>%
+  tally()
+      #visualize boxes in each category
+      ggplot(aes(x = depth_boxes, y = n, fill = benthic_pelagic)) +
+      geom_col(position = "dodge") +
+      my_ggtheme_p(leg_pos = "right") +
+      xlab("Depth Boxes") +
+      ylab("Number of Sites") +
+      scale_fill_viridis_d() +
+      coord_flip() +
+      facet_wrap(~ benthic_pelagic, ncol = 2, scale = "free_y")
+
+ggsave("../results/depth_boxes_distribution.png",
+       last_plot(),
+       width = 8,
+       height = 14)
+
+
+```
+
+```{r}
+spp_biodiv_df %>% 
+  mutate(
+    depth = as.numeric(depth_boxes)
+  ) %>%
+  # View()
+  ggplot(aes(x = depth, fill = benthic_pelagic)) +
+  geom_histogram(position = "dodge", bins = 10) +
+  my_ggtheme_p(leg_pos = "right") +
+  xlab("Depth (m)") +
+  ylab("Number of Sites") +
+  scale_fill_viridis_d() +
+  coord_flip() +
+  facet_wrap(~ benthic_pelagic, ncol = 2, scale = "free_y")
+```
+
+
