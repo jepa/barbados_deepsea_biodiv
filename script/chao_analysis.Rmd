@@ -35,7 +35,7 @@ sf::sf_use_s2(use_s2 = FALSE)
 sheet_url <- "https://docs.google.com/spreadsheets/d/1zDLZ5miZ0zkxt3uwPoNs-wWiTkUkr5bfBY41Hj-sqck/edit?gid=0#gid=0"
 
 spp_biodiv_df <- read_sheet(sheet_url,
-                   sheet = "Species",
+                   sheet = "Species_624",
                    col_types = "c"
                    ) %>%
       janitor::clean_names() %>% 
@@ -43,6 +43,9 @@ spp_biodiv_df <- read_sheet(sheet_url,
   filter(!is.na(benthic_pelagic),
          benthic_pelagic != "N/A")
           # Filter out rows without benthic/pelagic info
+
+
+length(unique(spp_biodiv_df$scientific_name)) #624
 
 fam_biodiv_df <- read_sheet(sheet_url,
                    sheet = "Family",
@@ -123,7 +126,7 @@ bio_spp <-
 
 
 ggsave(bio_spp,
-       filename = "../results/benthic_pelagic_diversity.png",
+       filename = "../results/benthic_pelagic_diversity_a.png",
        width = 9,
        height = 7)
 
@@ -174,7 +177,7 @@ bind_rows(
 ) %>% 
 # Save dataset
 write_csv(
-          "../results/spp_diversity_indices_bp.csv")
+          "../results/spp_diversity_indices_bp_new_spp.csv")
 
 ```
 
@@ -224,7 +227,7 @@ diversity_indices <- Hills_q_0_inc_CCZ$AsyEst
 write_csv(diversity_indices %>% mutate(category = c("Species Richness", "Shannon div.", "Simpson div"),
                                              ,level = "family",n = 11) %>% 
                 select(category,everything()),
-          "../results/fam_diversity_indices_new.csv")
+          "../results/fam_diversity_indices_new_spp.csv")
 
 ```
 
@@ -236,7 +239,7 @@ pp <- gridExtra::grid.arrange(
       ncol = 1)
 
 ggsave(
-      "../results/diversity_plots_bp_line_new.png",
+      "../results/diversity_plots_bp_line_new_spp.png",
       pp,
       width = 7,
       height = 5
@@ -298,7 +301,7 @@ spp_biodiv_df %>%
   mutate(
     depth = as.numeric(depth_boxes)
   ) %>%
-  # View()
+  filter(!is.na(depth)) %>% 
   ggplot(aes(x = depth, fill = benthic_pelagic)) +
   geom_histogram(position = "dodge", bins = 10) +
   my_ggtheme_p(leg_pos = "right") +
@@ -306,7 +309,9 @@ spp_biodiv_df %>%
   ylab("Number of Sites") +
   scale_fill_viridis_d() +
   coord_flip() +
-  facet_wrap(~ benthic_pelagic, ncol = 2, scale = "free_y")
+  facet_wrap(~ benthic_pelagic, ncol = 2, scale = "free_y") +
+  # fix x scale range
+  scale_x_continuous(breaks = seq(0, 6000, 500), limits = c(0, 6000))
 ```
 
 
